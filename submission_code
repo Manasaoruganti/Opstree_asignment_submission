@@ -1,0 +1,128 @@
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert_at_end(self, data):
+        new_node = Node(data)
+        if self.head is None:
+            self.head = new_node
+            return
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node
+
+    def print_linked_list(self):
+        current = self.head
+        while current:
+            print(current.data, end=" -> ")
+            current = current.next
+        print("None")
+
+def take_number_as_input(prompt):
+    number = input(prompt)
+    linked_list = LinkedList()
+    for digit in number[::-1]:
+        linked_list.insert_at_end(int(digit))
+    return linked_list
+
+def add_linked_lists(list1, list2):
+    carry = 0 
+    result_list = LinkedList()
+    current1 = list1.head
+    current2 = list2.head
+    
+    while current1 or current2 or carry:
+        sum_value = carry
+        if current1:
+            sum_value += current1.data
+            current1 = current1.next
+        if current2:
+            sum_value += current2.data
+            current2 = current2.next
+        carry, digit = divmod(sum_value, 10)
+        result_list.insert_at_end(digit)
+    
+    return result_list
+
+def subtract_linked_lists(list1, list2):
+    borrow = 0
+    result_list = LinkedList()
+    current1 = list1.head
+    current2 = list2.head
+    
+    while current1:
+        difference = current1.data - borrow
+        if current2:
+            difference -= current2.data
+            current2 = current2.next
+        borrow = 0 if difference >= 0 else 1
+        result_list.insert_at_end(difference if difference >= 0 else difference + 10)
+        current1 = current1.next
+    
+    # Remove leading zeros
+    current = result_list.head
+    while current and current.data == 0:
+        current = current.next
+    result_list.head = current
+    
+    return result_list
+
+def multiply_linked_lists(list1, list2):
+    result_list = LinkedList()
+    results = []
+    current2 = list2.head
+    position = 0
+    
+    while current2:
+        temp_result = LinkedList()
+        for _ in range(position):
+            temp_result.insert_at_end(0)
+        carry = 0
+        current1 = list1.head
+        while current1 or carry:
+            product = carry
+            if current1:
+                product += current1.data * current2.data
+                current1 = current1.next
+            carry, digit = divmod(product, 10)
+            temp_result.insert_at_end(digit)
+        results.append(temp_result)
+        current2 = current2.next
+        position += 1
+    
+    result_list = results[0]
+    for temp_result in results[1:]:
+        result_list = add_linked_lists(result_list, temp_result)
+    
+    return result_list
+
+def main():
+    list1 = take_number_as_input("Enter the first number: ")
+    list2 = take_number_as_input("Enter the second number: ")
+
+    print("First number as linked list:")
+    list1.print_linked_list()
+
+    print("Second number as linked list:")
+    list2.print_linked_list()
+
+    print("Addition result as linked list:")
+    result_add = add_linked_lists(list1, list2)
+    result_add.print_linked_list()
+
+    print("Subtraction result as linked list:")
+    result_subtract = subtract_linked_lists(list1, list2)
+    result_subtract.print_linked_list()
+
+    print("Multiplication result as linked list:")
+    result_multiply = multiply_linked_lists(list1, list2)
+    result_multiply.print_linked_list()
+
+if __name__ == "__main__":
+    main()
